@@ -9,15 +9,6 @@ public:
     {
         int n = startTime.size();
 
-        vector<int> gap_time;
-        gap_time.reserve(n + 1);
-        gap_time.emplace_back(startTime[0] - 0);
-        for (int i = 0; i + 1 < n; ++i)
-        {
-            gap_time.emplace_back(startTime[i + 1] - endTime[i]);
-        }
-        gap_time.emplace_back(eventTime - endTime[n - 1]);
-
         int max_gap_before = 0;
         int max_gap_after = 0;
         int result = 0;
