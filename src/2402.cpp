@@ -10,6 +10,8 @@ struct room
     int id = 0;
     int end_time = 0;
     int count = 0;
+    room(int id, int end_time, int count) : id(id), end_time(end_time), count(count) {}
+    room() = default;
 };
 
 bool operator<(const room &left, const room &right)

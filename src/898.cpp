@@ -10,7 +10,6 @@ public:
     {
         unordered_set<int> result;
         unordered_set<int> current;
-        int prev = 0;
 
         for (int num : arr)
         {

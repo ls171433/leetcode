@@ -37,7 +37,7 @@ public:
                 }
             }
             temp.push_back(std::make_pair(code[i], businessLine[i][0]));
-        next_loop:
+        next_loop:;
         }
 
         sort(temp.begin(), temp.end(), [](const pair<string, char> &left, const pair<string, char> &right)
@@ -45,7 +45,7 @@ public:
 
         vector<string> result;
         result.reserve(temp.size());
-        for (auto& value : temp)
+        for (auto &value : temp)
         {
             result.push_back(std::move(value.first));
         }

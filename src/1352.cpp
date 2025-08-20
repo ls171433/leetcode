@@ -1,3 +1,7 @@
+#include <vector>
+
+using namespace std;
+
 class ProductOfNumbers {
 public:
     vector<int> products;
