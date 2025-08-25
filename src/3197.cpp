@@ -8,207 +8,160 @@ using namespace std;
 class Solution
 {
 public:
+    vector<vector<int>> grid_sum;
+
     int minimumSum(vector<vector<int>> &grid)
     {
         int n = grid.size();
         int m = grid[0].size();
 
-        vector<int> row_sum(n, 0);
-        vector<int> col_sum(m, 0);
-        set<int> i_set;
-        set<int> j_set;
+        grid_sum = vector<vector<int>>(n + 1, vector<int>(m + 1, 0));
         for (int i = 0; i < n; ++i)
         {
             for (int j = 0; j < m; ++j)
             {
-                if (grid[i][j])
-                {
-                    i_set.insert(i);
-                    j_set.insert(j);
-                    ++row_sum[i];
-                    ++col_sum[j];
-                }
+                grid_sum[i + 1][j + 1] = grid[i][j] + grid_sum[i][j + 1] + grid_sum[i + 1][j] - grid_sum[i][j];
             }
         }
 
-        return min(minimumSum3H(grid, row_sum, col_sum, i_set, j_set), minimumSum3V(grid, row_sum, col_sum, i_set, j_set));
-    }
-
-    static int minimumSum3H(const vector<vector<int>> &grid, const vector<int> &row_sum, const vector<int> &col_sum, const set<int> &i_set, const set<int> &j_set)
-    {
-        int result = (*i_set.rbegin() - *i_set.begin() + 1) * (*j_set.rbegin() - *j_set.begin() + 1);
-
-        vector<int> col_sum_1(col_sum.size(), 0);
-        vector<int> col_sum_2(col_sum);
-
-        set<int> i_set_1;
-        set<int> i_set_2 = i_set;
-
-        set<int> j_set_1;
-        set<int> j_set_2 = j_set;
-
-        while (i_set_2.size() >= 2)
+        int result = INT_MAX;
+        for (int i1 = 1; i1 < n; ++i1)
         {
-            int i = *i_set_2.begin();
-            i_set_2.erase(i_set_2.begin());
-            i_set_1.insert(i);
-
-            for (int j : j_set)
+            for (int j2 = 1; j2 < m; ++j2)
             {
-                if (grid[i][j])
-                {
-                    ++col_sum_1[j];
-                    --col_sum_2[j];
-
-                    j_set_1.insert(j);
-                    if (!col_sum_2[j])
-                    {
-                        j_set_2.erase(j);
-                    }
-                }
+                result = min(result, min_area(0, 0, i1, m) + min_area(i1, 0, n, j2) + min_area(i1, j2, n, m));
+                result = min(result, min_area(0, 0, i1, j2) + min_area(0, j2, i1, m) + min_area(i1, 0, n, m));
             }
-
-            int area1 = (*i_set_1.rbegin() - *i_set_1.begin() + 1) * (*j_set_1.rbegin() - *j_set_1.begin() + 1);
-            int area2 = (*i_set_2.rbegin() - *i_set_2.begin() + 1) * (*j_set_2.rbegin() - *j_set_2.begin() + 1);
-
-            int area1_2 = min(minimumSum2V(grid, row_sum, i_set_1, j_set_1), minimumSum2H(grid, col_sum_1, i_set_1, j_set_1));
-            int area2_2 = min(minimumSum2V(grid, row_sum, i_set_2, j_set_2), minimumSum2H(grid, col_sum_2, i_set_2, j_set_2));
-
-            result = min(result, min(area1 + area2_2, area1_2 + area2));
+            for (int i2 = i1 + 1; i2 < n; ++i2)
+            {
+                result = min(result, min_area(0, 0, i1, m) + min_area(i1, 0, i2, m) + min_area(i2, 0, n, m));
+            }
+        }
+        for (int j1 = 1; j1 < m; ++j1)
+        {
+            for (int i2 = 1; i2 < n; ++i2)
+            {
+                result = min(result, min_area(0, 0, n, j1) + min_area(0, j1, i2, m) + min_area(i2, j1, n, m));
+                result = min(result, min_area(0, 0, i2, j1) + min_area(i2, 0, n, j1) + min_area(0, j1, n, m));
+            }
+            for (int j2 = j1 + 1; j2 < m; ++j2)
+            {
+                result = min(result, min_area(0, 0, n, j1) + min_area(0, j1, n, j2) + min_area(0, j2, n, m));
+            }
         }
 
         return result;
     }
 
-    static int minimumSum3V(const vector<vector<int>> &grid, const vector<int> &row_sum, const vector<int> &col_sum, const set<int> &i_set, const set<int> &j_set)
+    int get_sum(int x1, int y1, int x2, int y2)
     {
-        int result = (*i_set.rbegin() - *i_set.begin() + 1) * (*j_set.rbegin() - *j_set.begin() + 1);
-
-        vector<int> row_sum_1(row_sum.size(), 0);
-        vector<int> row_sum_2(row_sum);
-
-        set<int> i_set_1;
-        set<int> i_set_2 = i_set;
-
-        set<int> j_set_1;
-        set<int> j_set_2 = j_set;
-
-        while (j_set_2.size() >= 2)
-        {
-            int j = *j_set_2.begin();
-            j_set_2.erase(j_set_2.begin());
-            j_set_1.insert(j);
-
-            for (int i : i_set)
-            {
-                if (grid[i][j])
-                {
-                    ++row_sum_1[i];
-                    --row_sum_2[i];
-
-                    i_set_1.insert(i);
-                    if (!row_sum_2[i])
-                    {
-                        i_set_2.erase(i);
-                    }
-                }
-            }
-
-            int area1 = (*i_set_1.rbegin() - *i_set_1.begin() + 1) * (*j_set_1.rbegin() - *j_set_1.begin() + 1);
-            int area2 = (*i_set_2.rbegin() - *i_set_2.begin() + 1) * (*j_set_2.rbegin() - *j_set_2.begin() + 1);
-
-            int area1_2 = min(minimumSum2V(grid, row_sum_1, i_set_1, j_set_1), minimumSum2H(grid, col_sum, i_set_1, j_set_1));
-            int area2_2 = min(minimumSum2V(grid, row_sum_2, i_set_2, j_set_2), minimumSum2H(grid, col_sum, i_set_2, j_set_2));
-
-            result = min(result, min(area1 + area2_2, area1_2 + area2));
-        }
-
-        return result;
+        return grid_sum[x2][y2] - grid_sum[x1][y2] - grid_sum[x2][y1] + grid_sum[x1][y1];
     }
 
-    static int minimumSum2H(const vector<vector<int>> &grid, const vector<int> &col_sum, const set<int> &i_set, const set<int> &j_set)
+    int min_area(int x1, int y1, int x2, int y2)
     {
-        int result = (*i_set.rbegin() - *i_set.begin() + 1) * (*j_set.rbegin() - *j_set.begin() + 1);
-
-        // vector<int> col_sum_1(col_sum.size(), 0);
-        vector<int> col_sum_2(col_sum);
-
-        set<int> i_set_1;
-        set<int> i_set_2 = i_set;
-
-        set<int> j_set_1;
-        set<int> j_set_2 = j_set;
-
-        while (i_set_2.size() >= 2)
-        {
-            int i = *i_set_2.begin();
-            i_set_2.erase(i_set_2.begin());
-            i_set_1.insert(i);
-
-            for (int j : j_set)
-            {
-                if (grid[i][j])
-                {
-                    // ++col_sum_1[j];
-                    --col_sum_2[j];
-
-                    j_set_1.insert(j);
-                    if (!col_sum_2[j])
-                    {
-                        j_set_2.erase(j);
-                    }
-                }
-            }
-
-            int area1 = (*i_set_1.rbegin() - *i_set_1.begin() + 1) * (*j_set_1.rbegin() - *j_set_1.begin() + 1);
-            int area2 = (*i_set_2.rbegin() - *i_set_2.begin() + 1) * (*j_set_2.rbegin() - *j_set_2.begin() + 1);
-
-            result = min(result, area1 + area2);
-        }
-
-        return result;
+        return min_area_1(x1, y1, x2, y2);
+        // return min_area_2(x1, y1, x2, y2);
     }
 
-    static int minimumSum2V(const vector<vector<int>> &grid, const vector<int> &row_sum, const set<int> &i_set, const set<int> &j_set)
+    int min_area_1(int x1, int y1, int x2, int y2)
     {
-        int result = (*i_set.rbegin() - *i_set.begin() + 1) * (*j_set.rbegin() - *j_set.begin() + 1);
-
-        // vector<int> row_sum_1(row_sum.size(), 0);
-        vector<int> row_sum_2(row_sum);
-
-        set<int> i_set_1;
-        set<int> i_set_2 = i_set;
-
-        set<int> j_set_1;
-        set<int> j_set_2 = j_set;
-
-        while (j_set_2.size() >= 2)
+        int sum = get_sum(x1, y1, x2, y2);
+        if (sum <= 1)
         {
-            int j = *j_set_2.begin();
-            j_set_2.erase(j_set_2.begin());
-            j_set_1.insert(j);
-
-            for (int i : i_set)
-            {
-                if (grid[i][j])
-                {
-                    // ++row_sum_1[i];
-                    --row_sum_2[i];
-
-                    i_set_1.insert(i);
-                    if (!row_sum_2[i])
-                    {
-                        i_set_2.erase(i);
-                    }
-                }
-            }
-
-            int area1 = (*i_set_1.rbegin() - *i_set_1.begin() + 1) * (*j_set_1.rbegin() - *j_set_1.begin() + 1);
-            int area2 = (*i_set_2.rbegin() - *i_set_2.begin() + 1) * (*j_set_2.rbegin() - *j_set_2.begin() + 1);
-
-            result = min(result, area1 + area2);
+            return sum;
         }
 
-        return result;
+        while (x2 - x1 > 1 && get_sum(x1, y1, x1 + 1, y2) == 0)
+        {
+            ++x1;
+        }
+        while (x2 - x1 > 1 && get_sum(x2 - 1, y1, x2, y2) == 0)
+        {
+            --x2;
+        }
+        while (y2 - y1 > 1 && get_sum(x1, y1, x2, y1 + 1) == 0)
+        {
+            ++y1;
+        }
+        while (y2 - y1 > 1 && get_sum(x1, y2 - 1, x2, y2) == 0)
+        {
+            --y2;
+        }
+
+        return (x2 - x1) * (y2 - y1);
+    }
+
+    int min_area_2(int x1, int y1, int x2, int y2)
+    {
+        int sum = get_sum(x1, y1, x2, y2);
+        if (sum <= 1)
+        {
+            return sum;
+        }
+
+        int l, r;
+
+        l = x1, r = x2;
+        while (l < r)
+        {
+            int mid = (l + r) / 2;
+            if (get_sum(l, y1, mid + 1, y2) == 0)
+            {
+                l = mid + 1;
+            }
+            else
+            {
+                r = mid;
+            }
+        }
+        x1 = l;
+
+        l = x1, r = x2;
+        while (l < r)
+        {
+            int mid = (l + r) / 2;
+            if (get_sum(mid, y1, x2, y2) == 0)
+            {
+                r = mid;
+            }
+            else
+            {
+                l = mid + 1;
+            }
+        }
+        x2 = r;
+
+        l = y1, r = y2;
+        while (l < r)
+        {
+            int mid = (l + r) / 2;
+            if (get_sum(x1, l, x2, mid + 1) == 0)
+            {
+                l = mid + 1;
+            }
+            else
+            {
+                r = mid;
+            }
+        }
+        y1 = l;
+
+        l = y1, r = y2;
+        while (l < r)
+        {
+            int mid = (l + r) / 2;
+            if (get_sum(x1, mid, x2, y2) == 0)
+            {
+                r = mid;
+            }
+            else
+            {
+                l = mid + 1;
+            }
+        }
+        y2 = r;
+
+        return (x2 - x1) * (y2 - y1);
     }
 };
