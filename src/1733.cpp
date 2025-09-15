@@ -30,7 +30,7 @@ public:
         }
 
         vector<int> to_teach_user_count(n, 0);
-        int to_teach_size;
+        int to_teach_size = 0;
         for (int i = 0; i < m; ++i)
         {
             if (to_teach_user[i] == 0)

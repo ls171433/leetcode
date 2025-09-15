@@ -1,3 +1,4 @@
+#include <climits>
 #include <string>
 
 using namespace std;
