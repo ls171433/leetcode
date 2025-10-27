@@ -138,6 +138,7 @@ public:
     static vector<int> generate_beautiful_numbers()
     {
         vector<int> result;
+        result.reserve(110);
         vector_push_back_vector(result, generate_numbers_0({1}));
         vector_push_back_vector(result, generate_numbers_0({2}));
         vector_push_back_vector(result, generate_numbers_0({3}));
@@ -192,9 +193,6 @@ public:
 
     static void vector_push_back_vector(vector<int> &a, const vector<int> &b)
     {
-        for (int number : b)
-        {
-            a.push_back(number);
-        }
+        a.insert(a.end(), b.begin(), b.end());
     }
 };
